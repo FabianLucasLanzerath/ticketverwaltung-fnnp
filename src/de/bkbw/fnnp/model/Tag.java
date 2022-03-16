@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class Tag {
-	public final UUID uuid;
-	public String name;
-	public ArrayList<Ticket> tickets;
+	private final UUID uuid;
+	private String name;
+	private ArrayList<Ticket> tickets;
 	
 	public Tag(UUID uuid, String name, ArrayList<Ticket> tickets) {
 		this.uuid = uuid;

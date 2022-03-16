@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class Project {
-  public final UUID uuid;
-  public String name;
-  public ArrayList<Tag> tags;
+  private final UUID uuid;
+  private String name;
+  private ArrayList<Tag> tags;
 
   public Project(UUID uuid, String name, ArrayList<Tag> tags) {
       this.uuid = uuid;
