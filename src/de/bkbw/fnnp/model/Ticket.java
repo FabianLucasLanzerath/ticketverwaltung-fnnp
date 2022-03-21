@@ -14,7 +14,7 @@ public class Ticket {
   public LocalDateTime timeToFinish;
   public ArrayList<Comment> comments;
 
-  public Ticket(UUID uuid, String title, String content, User creator, LocalDateTime creationDate, User editor, LocalDateTime timeToFinish,  ArrayList<Comment> comments) {
+  public Ticket(UUID uuid, String title, String content, User creator, LocalDateTime creationDate, User editor, LocalDateTime timeToFinish, ArrayList<Comment> comments) {
       this.uuid = uuid;
       this.title = title;
       this.content = content;
@@ -27,5 +27,9 @@ public class Ticket {
 
   public UUID getUUID() {
       return this.uuid;
+  }
+  
+  public String getTitle() {
+	  return this.title;
   }
 }

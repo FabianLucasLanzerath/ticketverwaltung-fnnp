@@ -9,7 +9,7 @@ public class User {
     private String username;
     private UserRole userRole;
     private ArrayList<Device> devices;
-
+    
     public User(UUID uuid, String email, String username, UserRole userRole, ArrayList<Device> devices) {
         this.uuid = uuid;
         this.email = email;
