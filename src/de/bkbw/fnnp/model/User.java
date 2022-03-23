@@ -1,9 +1,10 @@
 package de.bkbw.fnnp.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
     private final UUID uuid;
     private String email;
     private String username;
