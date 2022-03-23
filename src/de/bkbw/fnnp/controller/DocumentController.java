@@ -110,7 +110,7 @@ public class DocumentController {
 			    String algorithm = "AES/CBC/PKCS5Padding";
 			    IvParameterSpec ivParameterSpec = cc.generateIv();
 			    InputStream resource = InputStream.class.getClassLoader().getResourceAsStream(filePath);
-			    File inputFile = resource.getFile();
+			    File inputFile = resource.
 			    String encryptedFile = new File(filePath).toString();
 			    String decryptedFile = new File(filePath).toString();
 			    cc.encrypt(encryptedFile, key, ivParameterSpec);
