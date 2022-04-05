@@ -1,5 +1,6 @@
 package de.bkbw.fnnp.controller;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,7 +8,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
@@ -19,6 +21,7 @@ import java.util.UUID;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
@@ -27,6 +30,7 @@ import javax.crypto.spec.IvParameterSpec;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import de.bkbw.fnnp.model.Ticket;
 import de.bkbw.fnnp.model.User;
@@ -89,76 +93,64 @@ public class DocumentController {
 		return tickets;
 	}
 	
-	public <E> ArrayList<E> loadJson(E fromClass, CryptoController cc) {
+	@SuppressWarnings("unchecked")
+	public <E> ArrayList<E> loadJson(E fromClass, CryptoController cc) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException, ClassNotFoundException {
+		ArrayList<E> result = new ArrayList<>();
+		String folderPath = null;
+		
+		if (fromClass == Ticket.class)
+			folderPath = this.ticketsDir;
+		
+		if (fromClass == User.class)
+			folderPath = this.usersDir;
+		
+		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		cipher.init(Cipher.DECRYPT_MODE, cc.getKeyFromPassword("NickolaiIstDoof", "123456789"), cc.generateIv());
+
 		try {
-			String folderPath = null;
-			if (fromClass.getClass() == Ticket.class)
-				folderPath = this.ticketsDir;
-			
-			if (fromClass.getClass() == User.class)
-				folderPath = this.usersDir;
-			
 			if (folderPath == null) 
 				throw new IOException();
 			
 			String files[] = new File(folderPath).list();
-			
+					
+			// TODO: Add decryption
 			for (String file : files) {
 				String filePath = folderPath + file;
 				
-				SecretKey key = cc.getKeyFromPassword("NickolaiIstDoof", "12345678");
-			    String algorithm = "AES/CBC/PKCS5Padding";
-			    IvParameterSpec ivParameterSpec = cc.generateIv();
-			    InputStream resource = InputStream.class.getClassLoader().getResourceAsStream(filePath);
-			    File inputFile = resource.
-			    String encryptedFile = new File(filePath).toString();
-			    String decryptedFile = new File(filePath).toString();
-			    cc.encrypt(encryptedFile, key, ivParameterSpec);
-			    cc.decrypt(
-			      decryptedFile, key, ivParameterSpec);
+				Serializable unsealObject = (Serializable) sealedObject.getObject(cipher);
+						
 			}
+			
+			
 		} catch (IOException e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 		
-		return null;
+		return result;
 	}
 	
-	public <E> void saveToJson(E classToSave, CryptoController cc) {
-		try {
-			String folderPath = null;
-			UUID fileId = UUID.randomUUID();
-			if (classToSave.getClass() == Ticket.class)
-				folderPath = this.ticketsDir;
-			
-			if (classToSave.getClass() == User.class)
-				folderPath = this.usersDir;
+	public <E> void saveJson(E object, CryptoController cc) throws ClassNotFoundException, BadPaddingException, IllegalBlockSizeException {
+		String folderPath = null;
+		UUID fileId = UUID.randomUUID();
+		
+		if (object.getClass() == Ticket.class)
+			folderPath = this.ticketsDir;
+		
+		if (object.getClass() == User.class)
+			folderPath = this.usersDir;
+		
+		try {			
 			if (folderPath == null) 
 				throw new IOException();
 			
-			FileWriter writer = new FileWriter(folderPath + "/" + fileId + ".json");
-			writer.write(this.gson.toJson(classToSave));
-			writer.close();
-			
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		    cipher.init(Cipher.ENCRYPT_MODE, cc.getKeyFromPassword("NickolaiIstDoof", "12345678"), cc.generateIv());;
-		    FileInputStream inputStream = new FileInputStream(folderPath + "/" + fileId + ".json");
-		    FileOutputStream outputStream = new FileOutputStream(folderPath + "/" + fileId + ".json");
-		    byte[] buffer = new byte[64];
-		    int bytesRead;
-		    while ((bytesRead = inputStream.read(buffer)) != -1) {
-		        byte[] output = cipher.update(buffer, 0, bytesRead);
-		        if (output != null) {
-		            outputStream.write(output);
-		        }
-		    }
-		    byte[] outputBytes = cipher.doFinal();
-		    if (outputBytes != null) {
-		        outputStream.write(outputBytes);
-		    }
-		    inputStream.close();
-		    outputStream.close();
-		} catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | InvalidKeySpecException | IllegalBlockSizeException | BadPaddingException e) {
+		    cipher.init(Cipher.ENCRYPT_MODE, cc.getKeyFromPassword("NickolaiIstDoof", "123456789"), cc.generateIv());
+			
+			// TODO: Add encryption
+		    SealedObject sealedObject = new SealedObject((Serializable) object, cipher);
+		    
+			
+		} catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
 			e.printStackTrace();
 		}
 	}

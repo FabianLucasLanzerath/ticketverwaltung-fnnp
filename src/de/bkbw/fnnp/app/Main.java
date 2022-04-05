@@ -19,11 +19,15 @@ import de.bkbw.fnnp.model.User;
 import de.bkbw.fnnp.model.UserRole;
 
 public class Main {
-	public static void main(String[] args) throws IllegalBlockSizeException, IOException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, ClassNotFoundException, BadPaddingException { 
+	public static <E> void main(String[] args) throws IllegalBlockSizeException, IOException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, ClassNotFoundException, BadPaddingException { 
 		DocumentController jc = DocumentController.getInstance();
 		CryptoController cc = CryptoController.getInstance();
 		
 		User user = new User(UUID.randomUUID(), "fnnp@bkbw.de", "Fabian", UserRole.USER, new ArrayList<Device>());
-		jc.saveToJson(user, cc);
+		jc.saveJson(user, cc);
+		
+		@SuppressWarnings("unchecked")
+		ArrayList<E> users = (ArrayList<E>) jc.loadJson(User.class, cc);
+		System.out.println(users);
 	}
 }
